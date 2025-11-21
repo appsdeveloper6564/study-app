@@ -200,7 +200,7 @@ const Home: React.FC = () => {
             <div className="text-xs opacity-80 mt-1">Join our channel</div>
           </a>
 
-          <a href="https://quizcentreforfree.blogsppot.com" target="_blank" rel="noopener noreferrer" 
+          <a href="https://quizcentreforfree.blogspot.com" target="_blank" rel="noopener noreferrer" 
              className="group p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-200 shadow-sm hover:shadow-md transition-all">
             <Globe className="mb-3 text-purple-500" size={28} />
             <div className="font-bold">Quiz Centre</div>

@@ -92,6 +92,9 @@ export const db = {
     await tx.done;
   },
   
+  async getChapter(id: string) {
+    return (await initDB()).get('chapters', id);
+  },
   async getChapters(subjectId: string) {
     return (await initDB()).getAllFromIndex('chapters', 'by-subject', subjectId);
   },
