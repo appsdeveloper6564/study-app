@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Book, ChevronRight, Folder, Layers, Trash2, Youtube, ExternalLink, Gamepad2, MessageCircle, Code, Mic, Gift, Globe } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
+import AdBanner from '../components/AdBanner';
 
 const Home: React.FC = () => {
   const { subjects, chapters, loading, addSubject, deleteSubject, addChapter } = useStore();
@@ -24,6 +25,32 @@ const Home: React.FC = () => {
 
   return (
     <main className="max-w-5xl mx-auto px-4 py-8 pb-24">
+      
+      {/* Ad: 728x90 Leaderboard (Desktop) */}
+      <div className="hidden md:block mb-6">
+        <AdBanner 
+          atOptions={{
+            key: '86c9fdb60c5ca35cc22b52c90b698e03',
+            format: 'iframe',
+            height: 90,
+            width: 728,
+            params: {}
+          }}
+        />
+      </div>
+
+      {/* Ad: 320x50 Mobile Banner */}
+      <div className="md:hidden mb-6">
+        <AdBanner 
+          atOptions={{
+            key: 'cc195540a99560ecf2fec170f25610ae',
+            format: 'iframe',
+            height: 50,
+            width: 320,
+            params: {}
+          }}
+        />
+      </div>
       
       {/* Subscriber Goal Banner */}
       {showSubBanner && (
@@ -65,6 +92,18 @@ const Home: React.FC = () => {
           <span className="hidden sm:inline">New Subject</span>
         </button>
       </div>
+
+      {/* Ad: 468x60 Mid Banner */}
+      <AdBanner 
+        atOptions={{
+          key: 'a227841c668bc753c8dab78ed9c9170b',
+          format: 'iframe',
+          height: 60,
+          width: 468,
+          params: {}
+        }}
+        className="hidden sm:flex md:hidden"
+      />
 
       {showNewSubject && (
         <div className="mb-8 animate-fade-in bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700">
@@ -165,6 +204,17 @@ const Home: React.FC = () => {
           </button>
         </div>
       )}
+
+      {/* Ad: 300x250 Square */}
+      <AdBanner 
+        atOptions={{
+          key: '4aa28cf13a10ae1967a926a6d3cf9d1d',
+          format: 'iframe',
+          height: 250,
+          width: 300,
+          params: {}
+        }}
+      />
 
       {/* Developer Showcase Grid - Moved to Bottom */}
       <div className="mt-12 border-t border-slate-200 dark:border-slate-800 pt-12">

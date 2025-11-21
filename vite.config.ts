@@ -6,7 +6,8 @@ export default defineConfig({
   plugins: [react()],
   define: {
     // Polyfill process.env for Vercel/Node environments in the browser
-    'process.env': process.env
+    // We must stringify it to prevent "process is not defined" in browser
+    'process.env': JSON.stringify(process.env)
   },
   build: {
     target: 'esnext'
