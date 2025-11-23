@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { StoreProvider } from './context/StoreContext';
 import Header from './components/Header';
 import Home from './pages/Home';
@@ -8,6 +8,8 @@ import QuizPlayer from './pages/QuizPlayer';
 import AIChat from './pages/AIChat';
 import Settings from './pages/Settings';
 import ChapterView from './pages/SubjectView';
+import SEOUpdater from './components/SEOUpdater';
+import CustomNotification from './components/CustomNotification';
 
 const App: React.FC = () => {
   const [darkMode, setDarkMode] = useState(() => {
@@ -31,8 +33,10 @@ const App: React.FC = () => {
 
   return (
     <StoreProvider>
-      <HashRouter>
+      <BrowserRouter>
+        <SEOUpdater />
         <div className="min-h-screen flex flex-col font-sans bg-slate-50 dark:bg-slate-900 transition-colors duration-200">
+          <CustomNotification />
           <Header darkMode={darkMode} toggleTheme={() => setDarkMode(!darkMode)} />
           <div className="flex-1">
             <Routes>
@@ -45,7 +49,7 @@ const App: React.FC = () => {
             </Routes>
           </div>
         </div>
-      </HashRouter>
+      </BrowserRouter>
     </StoreProvider>
   );
 };

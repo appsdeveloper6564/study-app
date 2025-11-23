@@ -39,33 +39,82 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [chats, setChats] = useState<ChatSession[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const seedDatabase = async () => {
+    console.log("Seeding database...");
+    
+    // 1. Mathematics
+    const mathId = crypto.randomUUID();
+    await db.addSubject({ id: mathId, name: 'Mathematics', icon: 'calculator', color: 'blue', createdAt: Date.now() });
+    
+    const algebraId = crypto.randomUUID();
+    await db.addChapter({ id: algebraId, subjectId: mathId, title: 'Algebra Basics', createdAt: Date.now() });
+    await db.addNote({ 
+        id: crypto.randomUUID(), 
+        chapterId: algebraId, 
+        title: 'Linear Equations', 
+        content: '# Linear Equations\n\nA linear equation is an equation that may be put in the form $ax + b = 0$, where $a$ and $b$ are constants.\n\n* **Slope-Intercept Form:** $y = mx + b$\n* **Standard Form:** $Ax + By = C$', 
+        type: 'formula', 
+        createdAt: Date.now() 
+    });
+
+    // 2. Computer Science
+    const csId = crypto.randomUUID();
+    await db.addSubject({ id: csId, name: 'Computer Science', icon: 'code', color: 'purple', createdAt: Date.now() });
+    
+    const reactId = crypto.randomUUID();
+    await db.addChapter({ id: reactId, subjectId: csId, title: 'React Hooks', createdAt: Date.now() });
+    await db.addNote({
+        id: crypto.randomUUID(),
+        chapterId: reactId,
+        title: 'useEffect Explained',
+        content: '# useEffect Hook\n\n`useEffect` is a React Hook that lets you synchronize a component with an external system.\n\n```javascript\nuseEffect(() => {\n  const connection = createConnection(serverUrl, roomId);\n  connection.connect();\n  return () => {\n    connection.disconnect();\n  };\n}, [serverUrl, roomId]);\n```',
+        type: 'eli5',
+        createdAt: Date.now()
+    });
+
+    // 3. History
+    const histId = crypto.randomUUID();
+    await db.addSubject({ id: histId, name: 'History', icon: 'landmark', color: 'orange', createdAt: Date.now() });
+    await db.addChapter({ id: crypto.randomUUID(), subjectId: histId, title: 'The Renaissance', createdAt: Date.now() });
+  };
+
   const refreshData = async () => {
     setLoading(true);
     try {
-      await initDB(); // Ensure DB is ready
       const allSubjects = await db.getSubjects();
-      setSubjects(allSubjects);
       
-      const chapMap: Record<string, Chapter[]> = {};
-      for (const sub of allSubjects) {
-        chapMap[sub.id] = await db.getChapters(sub.id);
+      // Auto-seed if empty
+      if (allSubjects.length === 0) {
+          await seedDatabase();
+          const seededSubjects = await db.getSubjects();
+          setSubjects(seededSubjects);
+          
+          // Load chapters for seeded subjects
+          const chapMap: Record<string, Chapter[]> = {};
+          for (const s of seededSubjects) {
+            chapMap[s.id] = await db.getChapters(s.id);
+          }
+          setChapters(chapMap);
+      } else {
+          setSubjects(allSubjects);
+          const chapMap: Record<string, Chapter[]> = {};
+          for (const s of allSubjects) {
+            chapMap[s.id] = await db.getChapters(s.id);
+          }
+          setChapters(chapMap);
       }
-      setChapters(chapMap);
 
-      const allQuizzes = await db.getQuizzes();
-      setQuizzes(allQuizzes.sort((a,b) => b.createdAt - a.createdAt));
-
-      const allChats = await db.getChats();
-      setChats(allChats.sort((a,b) => b.updatedAt - a.updatedAt));
-    } catch (e) {
-      console.error("Failed to load DB", e);
+      setQuizzes(await db.getQuizzes());
+      setChats(await db.getChats());
+    } catch (error) {
+      console.error("Failed to refresh data:", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    refreshData();
+    initDB().then(() => refreshData());
   }, []);
 
   const addSubject = async (name: string, icon: string, color: string) => {
@@ -74,7 +123,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       name,
       icon,
       color,
-      createdAt: Date.now()
+      createdAt: Date.now(),
     };
     await db.addSubject(newSubject);
     await refreshData();
@@ -86,41 +135,42 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const addChapter = async (subjectId: string, title: string) => {
-    const id = crypto.randomUUID();
-    await db.addChapter({
-      id,
+    const newChapter: Chapter = {
+      id: crypto.randomUUID(),
       subjectId,
       title,
-      createdAt: Date.now()
-    });
+      createdAt: Date.now(),
+    };
+    await db.addChapter(newChapter);
     await refreshData();
-    return id;
+    return newChapter.id;
   };
 
   const addNote = async (note: Note) => {
     await db.addNote(note);
-    // No need to full refresh usually, but keeps it simple
-    await refreshData();
+    // No full refresh needed for notes usually, but for simplicity
   };
 
   const addQuiz = async (quiz: Quiz) => {
     await db.addQuiz(quiz);
-    await refreshData();
+    setQuizzes(await db.getQuizzes());
   };
 
   const saveQuizResult = async (result: QuizResult) => {
     await db.saveResult(result);
   };
 
+  // Chat
   const createChat = async (title: string) => {
     const id = crypto.randomUUID();
-    await db.createChat({ id, title, updatedAt: Date.now() });
-    setChats(prev => [{ id, title, updatedAt: Date.now() }, ...prev]);
+    const session: ChatSession = { id, title, updatedAt: Date.now() };
+    await db.createChat(session);
+    setChats(await db.getChats());
     return id;
   };
 
-  const getChatMessages = async (sessionId: string) => {
-    return await db.getMessages(sessionId);
+  const getChatMessages = async (id: string) => {
+    return db.getMessages(id);
   };
 
   const sendChatMessage = async (sessionId: string, text: string, role: 'user' | 'model') => {
@@ -134,10 +184,22 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   return (
-    <StoreContext.Provider value={{ 
-      subjects, chapters, quizzes, loading, refreshData,
-      addSubject, deleteSubject, addChapter, addNote, addQuiz, saveQuizResult,
-      chats, createChat, getChatMessages, sendChatMessage
+    <StoreContext.Provider value={{
+      subjects,
+      chapters,
+      quizzes,
+      loading,
+      refreshData,
+      addSubject,
+      deleteSubject,
+      addChapter,
+      addNote,
+      addQuiz,
+      saveQuizResult,
+      chats,
+      createChat,
+      getChatMessages,
+      sendChatMessage
     }}>
       {children}
     </StoreContext.Provider>

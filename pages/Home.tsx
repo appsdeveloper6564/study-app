@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Book, ChevronRight, Folder, Layers, Trash2, Youtube, ExternalLink, Gamepad2, MessageCircle, Code, Mic, Gift, Globe } from 'lucide-react';
+import { Plus, Book, ChevronRight, Folder, Layers, Trash2, Youtube, Gift, Globe, Code, MessageCircle, Mic, Gamepad2 } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 import AdBanner from '../components/AdBanner';
 
