@@ -26,6 +26,8 @@ class ErrorBoundary extends Component<Props, State> {
 
   public render() {
     if (this.state.hasError) {
+      const isScriptError = this.state.error?.message?.toLowerCase().includes("script error");
+      
       return (
         <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 p-4">
           <div className="max-w-md w-full bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 text-center border border-slate-200 dark:border-slate-700">
@@ -36,7 +38,9 @@ class ErrorBoundary extends Component<Props, State> {
               Something went wrong
             </h1>
             <p className="text-slate-500 dark:text-slate-400 mb-6 text-sm break-words">
-              {this.state.error?.message || "An unexpected error occurred."}
+              {isScriptError 
+                ? "A third-party script or ad blocker might be interfering. Please try disabling your ad blocker or reloading the page." 
+                : (this.state.error?.message || "An unexpected error occurred.")}
             </p>
             <button
               onClick={() => window.location.reload()}

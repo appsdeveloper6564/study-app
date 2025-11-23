@@ -1,12 +1,13 @@
 import * as pdfjsLib from 'pdfjs-dist';
 
-// Configure worker
-// In a real environment, you'd point to the worker file. 
-// For this specific setup using CDN imports, we set the worker src to the CDN.
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
-
 export const extractTextFromPDF = async (file: File): Promise<string> => {
   try {
+    // Initialize worker strictly when needed, not at module load time
+    if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
+      const version = pdfjsLib.version || '4.0.379'; // Fallback version if detection fails
+      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${version}/pdf.worker.min.mjs`;
+    }
+
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     let fullText = '';
