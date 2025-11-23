@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import { CheckCircle, XCircle, ArrowRight, Home, AlertCircle } from 'lucide-react';
 import { Question } from '../types';
+import AdBanner from '../components/AdBanner';
 
 const QuizPlayer: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -84,6 +85,17 @@ const QuizPlayer: React.FC = () => {
             <p className="text-slate-500 mb-8">You got {score} out of {quiz.questions.length} correct</p>
             <button onClick={() => navigate('/')} className="w-full py-3 rounded-xl bg-slate-100 dark:bg-slate-700 font-semibold">Back Home</button>
          </div>
+         {/* Ad: 300x250 */}
+         <AdBanner 
+           atOptions={{
+             key: '4aa28cf13a10ae1967a926a6d3cf9d1d',
+             format: 'iframe',
+             height: 250,
+             width: 300,
+             params: {}
+           }}
+           className="mt-8"
+         />
       </div>
     );
   }
@@ -185,6 +197,18 @@ const QuizPlayer: React.FC = () => {
           </button>
         </div>
       )}
+
+      {/* Ad: 320x50 */}
+      <AdBanner 
+        atOptions={{
+          key: 'cc195540a99560ecf2fec170f25610ae',
+          format: 'iframe',
+          height: 50,
+          width: 320,
+          params: {}
+        }}
+        className="mt-8"
+      />
     </div>
   );
 };

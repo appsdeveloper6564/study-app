@@ -1,7 +1,8 @@
 import React, { useRef } from 'react';
-import { Download, Upload, Database, Trash2 } from 'lucide-react';
+import { Download, Upload, Database, Trash2, Moon, Sun } from 'lucide-react';
 import { db } from '../services/db';
 import { useStore } from '../context/StoreContext';
+import AdBanner from '../components/AdBanner';
 
 const Settings: React.FC = () => {
   const { refreshData } = useStore();
@@ -39,11 +40,23 @@ const Settings: React.FC = () => {
     reader.readAsText(file);
   };
 
+  const handleClearData = async () => {
+    if (confirm("Are you sure? This will delete ALL subjects, notes, and quizzes. This cannot be undone.")) {
+      // Basic implementation: delete DB
+      // In a real app, use db.deleteDatabase() or clear stores
+      const req = indexedDB.deleteDatabase('ai_study_db');
+      req.onsuccess = () => {
+        alert("Data cleared. reloading...");
+        window.location.reload();
+      };
+    }
+  };
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-8">Settings</h1>
 
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden mb-8">
         <div className="p-6 border-b border-slate-100 dark:border-slate-700">
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 rounded-lg">
@@ -58,29 +71,45 @@ const Settings: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
              <button 
                onClick={handleExport}
-               className="flex items-center justify-center gap-2 p-4 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+               className="flex items-center justify-center gap-2 p-4 rounded-xl border-2 border-slate-100 dark:border-slate-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/10 transition-all font-medium text-slate-700 dark:text-slate-300"
              >
-               <Download size={20} className="text-primary-600" />
-               <div className="text-left">
-                 <div className="font-semibold text-slate-900 dark:text-white">Backup Data</div>
-                 <div className="text-xs text-slate-500">Download JSON file</div>
-               </div>
+               <Download size={20} />
+               Export Backup
              </button>
 
              <button 
                onClick={() => fileRef.current?.click()}
-               className="flex items-center justify-center gap-2 p-4 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+               className="flex items-center justify-center gap-2 p-4 rounded-xl border-2 border-slate-100 dark:border-slate-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/10 transition-all font-medium text-slate-700 dark:text-slate-300"
              >
-               <Upload size={20} className="text-primary-600" />
-               <div className="text-left">
-                 <div className="font-semibold text-slate-900 dark:text-white">Restore Data</div>
-                 <div className="text-xs text-slate-500">Import JSON file</div>
-               </div>
-               <input type="file" ref={fileRef} className="hidden" onChange={handleImport} accept=".json" />
+               <Upload size={20} />
+               Import Backup
              </button>
+             <input type="file" ref={fileRef} onChange={handleImport} className="hidden" accept=".json" />
           </div>
         </div>
+
+        <div className="p-6 bg-red-50 dark:bg-red-900/10">
+           <h3 className="font-bold text-red-900 dark:text-red-200 mb-2">Danger Zone</h3>
+           <button 
+             onClick={handleClearData}
+             className="flex items-center gap-2 text-red-600 hover:text-red-700 font-medium"
+           >
+             <Trash2 size={18} /> Delete All Data
+           </button>
+        </div>
       </div>
+
+      {/* Ad: 300x250 */}
+      <AdBanner 
+        atOptions={{
+          key: '4aa28cf13a10ae1967a926a6d3cf9d1d',
+          format: 'iframe',
+          height: 250,
+          width: 300,
+          params: {}
+        }}
+        className="mt-8"
+      />
     </div>
   );
 };

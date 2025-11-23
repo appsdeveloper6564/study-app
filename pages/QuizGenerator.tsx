@@ -4,6 +4,7 @@ import { FileText, Type, Upload, Sparkles, Loader2 } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 import { generateQuiz, extractTopicsFromText } from '../services/geminiService';
 import { extractTextFromPDF } from '../services/pdfService';
+import AdBanner from '../components/AdBanner';
 
 const QuizGenerator: React.FC = () => {
   const [mode, setMode] = useState<'topic' | 'text' | 'pdf'>('topic');
@@ -38,10 +39,6 @@ const QuizGenerator: React.FC = () => {
 
       const quizData = await generateQuiz(context, topicName, 'medium');
       
-      // Auto-organize: Create Subject "Generated" -> Chapter "Topic" if not saving specifically
-      // For simplicity, we just dump into a "Quick Quizzes" subject or let user move it later.
-      // Here we create a temp structure for immediate play.
-      
       const quiz = {
         id: crypto.randomUUID(),
         title: quizData.title || topicName + " Quiz",
@@ -63,7 +60,29 @@ const QuizGenerator: React.FC = () => {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-8">Quiz Generator</h1>
+      <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">Quiz Generator</h1>
+
+      {/* Ad: 468x60 */}
+      <AdBanner 
+        atOptions={{
+          key: 'a227841c668bc753c8dab78ed9c9170b',
+          format: 'iframe',
+          height: 60,
+          width: 468,
+          params: {}
+        }}
+        className="mb-6 hidden sm:flex"
+      />
+      <AdBanner 
+        atOptions={{
+          key: 'cc195540a99560ecf2fec170f25610ae',
+          format: 'iframe',
+          height: 50,
+          width: 320,
+          params: {}
+        }}
+        className="mb-6 sm:hidden"
+      />
 
       {/* Mode Switcher */}
       <div className="grid grid-cols-3 gap-2 mb-8 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">

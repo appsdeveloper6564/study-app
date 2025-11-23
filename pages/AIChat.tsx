@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Send, Mic, Bot, User, MicOff, RotateCcw } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 import { generateAIChatResponse } from '../services/geminiService';
+import AdBanner from '../components/AdBanner';
 
 const AIChat: React.FC = () => {
   const { chats, createChat, getChatMessages, sendChatMessage } = useStore();
@@ -95,6 +96,20 @@ const AIChat: React.FC = () => {
 
   return (
     <div className="flex flex-col h-[calc(100vh-64px)] max-w-3xl mx-auto">
+      {/* Ad: 320x50 Mobile */}
+      <div className="p-2 flex justify-center bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+        <AdBanner 
+          atOptions={{
+            key: 'cc195540a99560ecf2fec170f25610ae',
+            format: 'iframe',
+            height: 50,
+            width: 320,
+            params: {}
+          }}
+          className="my-0"
+        />
+      </div>
+
       {/* Chat Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
         {messages.map((msg) => (

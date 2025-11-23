@@ -27,6 +27,7 @@ const AdBanner: React.FC<AdBannerProps> = ({ atOptions, className }) => {
     iframe.style.display = 'block';
     iframe.style.margin = '0 auto';
     iframe.scrolling = 'no';
+    iframe.title = "Advertisement";
 
     // Clear previous content
     bannerRef.current.innerHTML = '';
@@ -38,8 +39,11 @@ const AdBanner: React.FC<AdBannerProps> = ({ atOptions, className }) => {
       doc.write(`
         <!DOCTYPE html>
         <html>
-          <head><base target="_blank" /></head>
-          <body style="margin:0;padding:0;display:flex;justify-content:center;align-items:center;">
+          <head>
+            <base target="_blank" />
+            <style>body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; overflow: hidden; }</style>
+          </head>
+          <body>
             <script type="text/javascript">
               atOptions = ${JSON.stringify(atOptions)};
             </script>

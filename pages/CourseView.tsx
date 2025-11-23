@@ -4,6 +4,7 @@ import { useStore } from '../context/StoreContext';
 import { BookOpen, List, GraduationCap, ArrowLeft, FileText, Sparkles } from 'lucide-react';
 import QuizRunner from '../components/QuizRunner';
 import { Quiz, QuizResult, Note } from '../types';
+import AdBanner from '../components/AdBanner';
 
 // Simple markdown renderer component
 const MarkdownView: React.FC<{ content: string }> = ({ content }) => {
@@ -152,6 +153,18 @@ const CourseView: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Ad: 300x250 */}
+      <AdBanner 
+        atOptions={{
+          key: '4aa28cf13a10ae1967a926a6d3cf9d1d',
+          format: 'iframe',
+          height: 250,
+          width: 300,
+          params: {}
+        }}
+        className="mt-8"
+      />
     </div>
   );
 };

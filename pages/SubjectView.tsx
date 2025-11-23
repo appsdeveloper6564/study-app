@@ -6,6 +6,7 @@ import { Note, Quiz, Chapter } from '../types';
 import { PenTool, GraduationCap, Plus, ArrowLeft } from 'lucide-react';
 import { generateNotes, generateQuiz } from '../services/geminiService';
 import ReactMarkdown from 'react-markdown';
+import AdBanner from '../components/AdBanner';
 
 // Component to view a specific Chapter
 const ChapterView: React.FC = () => {
@@ -147,6 +148,29 @@ const ChapterView: React.FC = () => {
                     </div>
                 </div>
             )}
+
+            {/* Ad: 468x60 */}
+            <AdBanner 
+              atOptions={{
+                key: 'a227841c668bc753c8dab78ed9c9170b',
+                format: 'iframe',
+                height: 60,
+                width: 468,
+                params: {}
+              }}
+              className="mt-8 hidden sm:flex"
+            />
+            {/* Ad: 320x50 Mobile */}
+            <AdBanner 
+              atOptions={{
+                key: 'cc195540a99560ecf2fec170f25610ae',
+                format: 'iframe',
+                height: 50,
+                width: 320,
+                params: {}
+              }}
+              className="mt-8 sm:hidden"
+            />
         </div>
     );
 };

@@ -6,12 +6,8 @@ let aiInstance: GoogleGenAI | null = null;
 
 const getAI = () => {
   if (!aiInstance) {
-    const key = process.env.API_KEY;
-    if (!key) {
-      // Return a dummy instance or throw a specific error that can be caught by UI
-      throw new Error("API Key is missing. Please configure your API_KEY in Vercel settings.");
-    }
-    aiInstance = new GoogleGenAI({ apiKey: key });
+    // Fix: Use process.env.API_KEY directly and assume it is valid as per guidelines
+    aiInstance = new GoogleGenAI({ apiKey: process.env.API_KEY });
   }
   return aiInstance;
 };
@@ -66,25 +62,32 @@ export const generateQuiz = async (
   For True/False, correctAnswer should be "True" or "False".
   `;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: prompt,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: quizSchema,
-      temperature: 0.7,
-    },
-  });
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: quizSchema,
+        temperature: 0.7,
+      },
+    });
 
-  const data = JSON.parse(response.text!);
-  return {
-    title: data.title,
-    questions: data.questions.map((q: any) => ({
-      id: crypto.randomUUID(),
-      ...q,
-      options: q.options || [] // Ensure array for non-MCQ safety
-    }))
-  };
+    if (!response.text) throw new Error("No response from AI");
+    
+    const data = JSON.parse(response.text);
+    return {
+      title: data.title,
+      questions: data.questions.map((q: any) => ({
+        id: crypto.randomUUID(),
+        ...q,
+        options: q.options || [] // Ensure array for non-MCQ safety
+      }))
+    };
+  } catch (error) {
+    console.error("Gemini Quiz Generation Error:", error);
+    throw new Error("Failed to generate quiz. Please check your API key or try again later.");
+  }
 };
 
 export const generateNotes = async (
@@ -109,16 +112,23 @@ export const generateNotes = async (
   Format the content in clean Markdown.
   `;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: prompt,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: noteSchema,
-    },
-  });
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: noteSchema,
+      },
+    });
 
-  return JSON.parse(response.text!);
+    if (!response.text) throw new Error("No response from AI");
+
+    return JSON.parse(response.text);
+  } catch (error) {
+    console.error("Gemini Note Generation Error:", error);
+    throw new Error("Failed to generate notes. Please try again.");
+  }
 };
 
 export const generateAIChatResponse = async (
@@ -144,20 +154,26 @@ export const generateAIChatResponse = async (
   return result.text;
 };
 
-// Helper to identify topics from text
 export const extractTopicsFromText = async (text: string): Promise<string[]> => {
     const ai = getAI();
-    const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: `Extract 3-5 main topics/subjects from this text. Return as JSON list of strings. Text: ${text.substring(0, 2000)}`,
-        config: {
-            responseMimeType: "application/json",
-            responseSchema: {
-                type: Type.OBJECT,
-                properties: { topics: { type: Type.ARRAY, items: { type: Type.STRING } } }
+    try {
+        const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: `Extract 3-5 main topics/subjects from this text. Return as JSON list of strings. Text: ${text.substring(0, 2000)}`,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: { topics: { type: Type.ARRAY, items: { type: Type.STRING } } }
+                }
             }
-        }
-    });
-    const json = JSON.parse(response.text!);
-    return json.topics || [];
+        });
+        
+        if (!response.text) return [];
+        const json = JSON.parse(response.text);
+        return json.topics || [];
+    } catch (error) {
+        console.error("Topic extraction failed:", error);
+        return [];
+    }
 }

@@ -3,14 +3,54 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Smart Learning Hub</title>
-    <meta name="description" content="AI-powered learning companion with offline support" />
+    <title>Smart Learning Hub - AI Study Companion</title>
+    <meta name="description" content="AI-powered learning companion. Generate quizzes, study notes, and summaries instantly for any topic. Works offline." />
     
+    <!-- Google Site Verification -->
+    <meta name="google-site-verification" content="5X7zBKR8r5qsXWtkCz9v1IBe-PXjgal1IP2FkYFw4l4" />
+    
+    <!-- SEO & Indexing -->
+    <meta name="robots" content="index, follow" />
+    <meta name="keywords" content="AI study tool, quiz generator, smart learning hub, flashcards, AI tutor, exam preparation, study notes, offline study app, education technology" />
+    <meta name="author" content="Smart Learning Hub" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://studysmartandlearn.vercel.app/" />
+    <meta property="og:title" content="Smart Learning Hub - AI Powered Study Companion" />
+    <meta property="og:description" content="Generate quizzes, study notes, and summaries instantly with AI. Your offline-first personal tutor." />
+    <meta property="og:image" content="https://picsum.photos/1200/630" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://studysmartandlearn.vercel.app/" />
+    <meta property="twitter:title" content="Smart Learning Hub - AI Powered Study Companion" />
+    <meta property="twitter:description" content="Generate quizzes, study notes, and summaries instantly with AI. Your offline-first personal tutor." />
+    <meta property="twitter:image" content="https://picsum.photos/1200/630" />
+
     <!-- Monetag Verification -->
     <meta name="monetag" content="06c55e4537dcce1f38674f39b6ac8c57">
     
     <!-- Canonical URL -->
     <link rel="canonical" href="https://studysmartandlearn.vercel.app/" />
+    
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Smart Learning Hub",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "An AI-powered study companion that generates summaries, notes, and quizzes for any topic instantly.",
+      "featureList": "AI Quiz Generator, Study Notes, Offline Mode, Progress Tracking"
+    }
+    </script>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="manifest" href="/manifest.json" />
@@ -81,6 +121,11 @@
         height: 100vh;
         width: 100vw;
         background-color: #f8fafc;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out;
       }
       .dark .loader-container {
         background-color: #0f172a;
@@ -98,43 +143,52 @@
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
       }
+      /* Hide loading when app is mounted (handled by React or CSS class) */
+      body:has(#root:not(:empty)) .loader-container {
+          display: none;
+      }
     </style>
 <script type="importmap">
 {
   "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
     "react": "https://aistudiocdn.com/react@^19.2.0",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
     "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.6",
     "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
-    "idb": "https://aistudiocdn.com/idb@^8.0.3",
-    "pdfjs-dist": "https://aistudiocdn.com/pdfjs-dist@^5.4.394",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1",
     "react-markdown": "https://aistudiocdn.com/react-markdown@^10.1.0",
     "vite": "https://aistudiocdn.com/vite@^7.2.4",
-    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1"
+    "idb": "https://aistudiocdn.com/idb@^8.0.3",
+    "pdfjs-dist": "https://aistudiocdn.com/pdfjs-dist@^5.4.394"
   }
 }
 </script>
 </head>
   <body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 transition-colors duration-200">
-    <div id="root">
-      <!-- Initial Loading State -->
-      <div class="loader-container">
-        <div class="loader"></div>
-      </div>
+    <!-- Initial Loading State -->
+    <div class="loader-container" id="app-loader">
+      <div class="loader"></div>
     </div>
+
+    <div id="root"></div>
     
     <!-- Adsterra Native Container -->
     <div id="container-1c3ed821957727ca7e14d236cf411fd9" style="display: flex; justify-content: center; margin: 20px 0; min-height: 250px;"></div>
 
     <script type="module" src="/index.tsx"></script>
     <script>
-      // Simple process polyfill for client-side only usage if not built
-      if (typeof window !== 'undefined' && !window.process) {
-        window.process = { env: {} };
-      }
-      
+      // Remove loader when React mounts
+      const observer = new MutationObserver((mutations) => {
+        if (document.getElementById('root').children.length > 0) {
+           const loader = document.getElementById('app-loader');
+           if(loader) loader.style.display = 'none';
+           observer.disconnect();
+        }
+      });
+      observer.observe(document.getElementById('root'), { childList: true });
+
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/service-worker.js')
@@ -148,15 +202,15 @@
       }
     </script>
 
-    <!-- Adsterra & Other Scripts - Defer to prevent blocking -->
-    <script defer type='text/javascript' src='//pl28105770.effectivegatecpm.com/06/49/ba/0649bab448e73cf9519bc01281748ef7.js'></script>
-    <script defer type='text/javascript' src='//pl28105766.effectivegatecpm.com/da/d2/4b/dad24b5b7a9134af88cac26fc4f1b409.js'></script>
-    <script defer async="async" data-cfasync="false" src="//pl28105769.effectivegatecpm.com/1c3ed821957727ca7e14d236cf411fd9/invoke.js"></script>
+    <!-- Adsterra & Other Scripts - Placed at bottom, no defer to ensure execution order if required by network -->
+    <script type='text/javascript' src='//pl28105770.effectivegatecpm.com/06/49/ba/0649bab448e73cf9519bc01281748ef7.js'></script>
+    <script type='text/javascript' src='//pl28105766.effectivegatecpm.com/da/d2/4b/dad24b5b7a9134af88cac26fc4f1b409.js'></script>
+    <script async="async" data-cfasync="false" src="//pl28105769.effectivegatecpm.com/1c3ed821957727ca7e14d236cf411fd9/invoke.js"></script>
     
     <!-- MultiTag -->
-    <script defer src="https://fpyf8.com/88/tag.min.js" data-zone="187491" async data-cfasync="false"></script>
+    <script src="https://fpyf8.com/88/tag.min.js" data-zone="187491" async data-cfasync="false"></script>
     
     <!-- Additional Tag (Nap5k) -->
-    <script defer>(function(s){s.dataset.zone='10226056',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+    <script>(function(s){s.dataset.zone='10226056',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
   </body>
 </html>

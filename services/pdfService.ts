@@ -2,9 +2,10 @@ import * as pdfjsLib from 'pdfjs-dist';
 
 export const extractTextFromPDF = async (file: File): Promise<string> => {
   try {
-    // Initialize worker strictly when needed, not at module load time
+    // Initialize worker strictly when needed.
+    // We use a specific version matching package.json (4.0.379) to avoid conflicts.
     if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
-      const version = pdfjsLib.version || '4.0.379'; // Fallback version if detection fails
+      const version = '4.0.379'; 
       pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${version}/pdf.worker.min.mjs`;
     }
 
@@ -24,6 +25,6 @@ export const extractTextFromPDF = async (file: File): Promise<string> => {
     return fullText;
   } catch (error) {
     console.error("PDF extraction failed:", error);
-    throw new Error("Failed to parse PDF. Please ensure it is a valid text-based PDF.");
+    throw new Error("Failed to parse PDF. Please ensure it is a valid text-based PDF file.");
   }
 };
