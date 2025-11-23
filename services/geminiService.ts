@@ -1,7 +1,20 @@
 import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { Quiz, Note, Question } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Lazy initialization to prevent crashes during build or initial load if API key is missing
+let aiInstance: GoogleGenAI | null = null;
+
+const getAI = () => {
+  if (!aiInstance) {
+    const key = process.env.API_KEY;
+    if (!key) {
+      // Return a dummy instance or throw a specific error that can be caught by UI
+      throw new Error("API Key is missing. Please configure your API_KEY in Vercel settings.");
+    }
+    aiInstance = new GoogleGenAI({ apiKey: key });
+  }
+  return aiInstance;
+};
 
 // --- Schemas ---
 
@@ -43,6 +56,7 @@ export const generateQuiz = async (
   topic: string,
   difficulty: string = 'medium'
 ): Promise<Partial<Quiz>> => {
+  const ai = getAI();
   const prompt = `Generate a quiz about "${topic}". 
   Difficulty: ${difficulty}.
   Context: ${context ? context.substring(0, 10000) : "Use your general knowledge."}
@@ -78,6 +92,7 @@ export const generateNotes = async (
   type: 'bullet' | 'long' | 'eli5' | 'formula' | 'mindmap',
   context?: string
 ): Promise<Partial<Note>> => {
+  const ai = getAI();
   let instruction = "";
   switch (type) {
     case 'bullet': instruction = "Create concise bullet-point notes covering key concepts."; break;
@@ -110,9 +125,7 @@ export const generateAIChatResponse = async (
   history: { role: string, text: string }[],
   message: string
 ) => {
-  // Using basic generateContent for chat to keep it stateless/simple for now, 
-  // or we could use chats.create if we managed the object.
-  // Given the "No Backend" rule, we pass history each time.
+  const ai = getAI();
   
   const chatHistory = history.map(h => ({
     role: h.role === 'model' ? 'model' : 'user',
@@ -133,6 +146,7 @@ export const generateAIChatResponse = async (
 
 // Helper to identify topics from text
 export const extractTopicsFromText = async (text: string): Promise<string[]> => {
+    const ai = getAI();
     const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
         contents: `Extract 3-5 main topics/subjects from this text. Return as JSON list of strings. Text: ${text.substring(0, 2000)}`,
